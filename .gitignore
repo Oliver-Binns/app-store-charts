@@ -10,6 +10,7 @@ xcuserdata/
 *.xccheckout
 
 ## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
+.DS_Store
 build/
 DerivedData/
 *.moved-aside
@@ -30,6 +31,9 @@ DerivedData/
 *.dSYM.zip
 *.dSYM
 
+## Secrets
+*.p8
+
 ## Playgrounds
 timeline.xctimeline
 playground.xcworkspace
@@ -44,7 +48,7 @@ playground.xcworkspace
 #
 # Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
 # hence it is not needed unless you have added a package configuration file to your project
-# .swiftpm
+.swiftpm
 
 .build/
 
@@ -67,7 +71,6 @@ playground.xcworkspace
 Carthage/Build/
 
 # Accio dependency management
-Dependencies/
 .accio/
 
 # fastlane
@@ -88,3 +91,4 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+.idea/
