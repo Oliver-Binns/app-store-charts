@@ -1,3 +1,5 @@
+import Foundation
+
 @main
 struct Runner {
     static func main() async throws {
@@ -13,7 +15,14 @@ struct Runner {
             
             let downloads = try await AppStoreConnectAPIService(configuration: configuration)
                 .fetchDownloadStatistics()
-            print(downloads)
+
+            let url = FileManager.default.temporaryDirectory.appending(components: "downloads.png")
+            await ChartService(title: "Downloads of \(appName) in October 2022",
+                               data: downloads,
+                               size: .init(width: 700, height: 400))
+                .write(to: url)
+
+            print(url.absoluteString)
         } catch {
             print("error", error)
         }

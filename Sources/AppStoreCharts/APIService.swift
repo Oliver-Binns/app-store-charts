@@ -6,12 +6,6 @@ protocol APIService {
     func fetchDownloadStatistics() async throws -> [DatePoint]
 }
 
-struct PrivateKey {
-    let keyID: String
-    let issuerID: String
-    let rawKey: String
-}
-
 final class AppStoreConnectAPIService: APIService {
     struct Configuration {
         let privateKey: PrivateKey
@@ -22,21 +16,15 @@ final class AppStoreConnectAPIService: APIService {
     let configuration: APIConfiguration
     let vendorNumber: String
     let appName: String
-    
+
     lazy var provider = APIProvider(configuration: configuration)
-    
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "YYYY-MM-dd"
-        return formatter
-    }()
     
     init(configuration: Configuration) {
         self.vendorNumber = configuration.vendorNumber
         self.appName = configuration.appName
         self.configuration = APIConfiguration(issuerID: configuration.privateKey.issuerID,
                                               privateKeyID: configuration.privateKey.keyID,
-                                              privateKey: configuration.privateKey.rawKey)
+                                              privateKey: configuration.privateKey.extractedKey)
     }
     
     private func request(for date: String) -> Request<Data> {
@@ -93,7 +81,7 @@ final class AppStoreConnectAPIService: APIService {
                                                         returning: [DatePoint].self) { group in
             dates.forEach { date in
                 group.addTask { [unowned self] in
-                    let units = try await self.getUnits(for: dateFormatter.string(from: date)) ?? 0
+                    let units = try await self.getUnits(for: DateFormatter.iso.string(from: date)) ?? 0
                     return DatePoint(date: date, units: units)
                 }
             }
