@@ -6,19 +6,22 @@ protocol APIService {
     func fetchDownloadStatistics() async throws -> [DatePoint]
 }
 
+struct PrivateKey {
+    let keyID: String
+    let issuerID: String
+    let rawKey: String
+}
+
 final class AppStoreConnectAPIService: APIService {
-    var privateKey: String {
-        """
-        """
+    struct Configuration {
+        let privateKey: PrivateKey
+        let vendorNumber: String
+        let appName: String
     }
     
-    var configuration: APIConfiguration {
-        .init(issuerID: "",
-              privateKeyID: "",
-              privateKey: privateKey.components(separatedBy: .newlines)
-            .filter { !$0.isEmpty && !$0.contains("-----") }
-            .joined())
-    }
+    let configuration: APIConfiguration
+    let vendorNumber: String
+    let appName: String
     
     lazy var provider = APIProvider(configuration: configuration)
     
@@ -28,10 +31,12 @@ final class AppStoreConnectAPIService: APIService {
         return formatter
     }()
     
-    let appName: String
-    
-    init(appName: String) {
-        self.appName = appName
+    init(configuration: Configuration) {
+        self.vendorNumber = configuration.vendorNumber
+        self.appName = configuration.appName
+        self.configuration = APIConfiguration(issuerID: configuration.privateKey.issuerID,
+                                              privateKeyID: configuration.privateKey.keyID,
+                                              privateKey: configuration.privateKey.rawKey)
     }
     
     private func request(for date: String) -> Request<Data> {
@@ -40,7 +45,7 @@ final class AppStoreConnectAPIService: APIService {
                                    filterReportDate: [date],
                                    filterReportSubType: [.summary],
                                    filterReportType: [.sales],
-                                   filterVendorNumber: [""],
+                                   filterVendorNumber: [vendorNumber],
                                    filterVersion: ["1_0"]))
     }
     
